@@ -40,8 +40,8 @@ Chi tiết trạng thái, trigger giả lập và self-check của từng protot
 
 ## 4. Đóng góp của tôi trong nhóm
 
-- **Option phụ trách chính:** Option A
-- **Shared context/content:** hỗ trợ chỉnh sửa prototype option B, C; soạn và tổng hợp bài nộp cuối lên github.
+- **Option phụ trách chính:** Option B, C
+- **Shared context/content:** hỗ trợ chỉnh sửa prototype option A; soạn và tổng hợp bài nộp cuối lên github.
 - **Human–AI decisions:** Phản biện các quyết định Act/Ask/Don't Act trong Human–AI Decision Table
 - **Facilitation:**
 - **Observation / tổng hợp feedback:**
