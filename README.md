@@ -5,7 +5,7 @@
 | Thông tin                | Nội dung                                                              |
 | ------------------------- | ---------------------------------------------------------------------- |
 | **MHV**             | 2A202601212                                                            |
-| **Họ và tên**    | Trương                                                               |
+| **Họ và tên**    | Trương Quang Minh                                                    |
 | **Tên nhóm**      | MT                                                                     |
 | **Thành viên**    | Trương Quang Minh - 2A202601212; Nguyễn Thị Thương - 2A202601226 |
 | **Case đã chọn** | Case A — AI Tutor: Diagnostic Refresher                               |
