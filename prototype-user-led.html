@@ -10,72 +10,106 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Prototype A — User-led</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f4f5f7; --card:#ffffff; --ink:#1c1f26; --muted:#6b7280;
-    --border:#e3e5ea; --accent:#c2410c; --accent-bg:#fff1e8;
-    --primary:#2563eb; --primary-ink:#ffffff;
-    --ok:#15803d; --ok-bg:#eafbef;
-    --ai:#7c3aed; --ai-bg:#f3eefe;
+    /* Token hệ thống — nền tảng học AI/UX: điềm tĩnh, có cấu trúc, tiến bộ từng bước */
+    --bg:#eef1f7; --surface:#ffffff; --surface-2:#f3f5fa;
+    --ink:#141824; --ink-soft:#2a3040; --muted:#5c6472;
+    --border:#dde2ec; --border-soft:#e7eaf2;
+    --primary:#3452d8; --primary-ink:#ffffff; --primary-soft:#e9edfd;
+    --accent:#b1560f; --accent-bg:#fdefe1; --accent-ink:#7a3a08;
+    --ok:#127a4e; --ok-bg:#e6f7ef;
+    --ai:#6a2ed6; --ai-bg:#f2ecfe; --ai-border:#dccdfb;
+    --step-done:#127a4e; --step-active:#3452d8; --step-todo:#c7cede;
+    --font-display:"Sora","Segoe UI",sans-serif;
+    --font-body:"Inter","Segoe UI",sans-serif;
+    --shadow-card:0 1px 2px rgba(20,24,36,.04), 0 8px 24px -12px rgba(20,24,36,.10);
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;}
-  .topbar h1{font-size:15px;margin:0;font-weight:600;}
-  .reset{font-size:13px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;}
-  .stage{max-width:1080px;margin:32px auto 80px;padding:0 16px;display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
-  @media (max-width:860px){ .stage{grid-template-columns:1fr;} .side{position:static;max-height:none;} }
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-  .side{position:sticky;top:78px;max-height:calc(100vh - 96px);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;}
-  .side-head{padding:16px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--ink);flex-shrink:0;}
-  .side-empty{padding:18px;font-size:13px;color:var(--muted);line-height:1.6;}
-  .badge{display:inline-block;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-bg);padding:4px 10px;border-radius:999px;margin-bottom:14px;}
-  h2{font-size:20px;margin:0 0 8px;}
-  p.lead{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 20px;}
+  body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+  :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px;}
 
-  /* slide viewer layout */
-  .viewer{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-  .slide-sidebar{width:180px;flex-shrink:0;background:#fafafa;border-right:1px solid var(--border);padding:14px 0;}
-  .slide-sidebar-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:0 14px 10px;}
-  .slide-item{padding:9px 14px;font-size:13px;color:var(--muted);border-left:3px solid transparent;}
-  .slide-item.active{color:var(--ink);font-weight:600;border-left-color:var(--primary);background:#eef2ff;}
-  .slide-main{flex:1;padding:22px;background:#fff;}
-  .slide-eyebrow{font-size:12px;color:var(--muted);margin-bottom:6px;}
-  .slide-title{font-size:17px;font-weight:700;margin:0 0 12px;}
-  .slide-body{font-size:14px;line-height:1.9;color:#374151;user-select:text;}
-  .slide-body p{margin:0 0 12px;}
-  .slide-body strong{color:var(--ink);}
-  ::selection{background:#fde68a;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;}
+  .topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
+  .topbar-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--primary),#5a72e8);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-weight:800;font-size:13px;}
+  .topbar h1{font-family:var(--font-display);font-size:14.5px;margin:0;font-weight:700;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .reset{font-size:13px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:var(--font-body);flex-shrink:0;}
+  .reset:hover{background:var(--surface-2);color:var(--ink);}
 
-  .select-hint{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;}
-  .help-btn{margin-top:14px;width:100%;padding:13px;border-radius:10px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;}
-  .or-sep{text-align:center;color:var(--muted);font-size:12px;margin:16px 0;}
+  .stage{max-width:1480px;margin:32px auto 80px;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;align-items:start;}
+  @media (max-width:1100px){ .stage{grid-template-columns:1fr;} .side{position:static;max-height:none;} }
+  .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:16px;padding:28px;box-shadow:var(--shadow-card);}
+  .side{position:sticky;top:78px;max-height:calc(100vh - 96px);display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-soft);border-radius:16px;box-shadow:var(--shadow-card);overflow:hidden;}
+  .side-head{padding:16px 18px;border-bottom:1px solid var(--border-soft);font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--ink);flex-shrink:0;display:flex;align-items:center;gap:8px;}
+  .side-head:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ai);flex-shrink:0;}
+  .side-empty{padding:20px 18px;font-size:13px;color:var(--muted);line-height:1.7;}
+  .badge{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.02em;color:var(--primary);background:var(--primary-soft);padding:5px 11px;border-radius:999px;margin-bottom:16px;}
+  h2{font-family:var(--font-display);font-size:21px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em;}
+  p.lead{color:var(--muted);font-size:14px;line-height:1.65;margin:0 0 22px;}
+  p.lead strong{color:var(--ink-soft);font-weight:600;}
+
+  /* slide viewer layout — slide là nhân vật chính, sidebar là hành trình từng bước (signature) */
+  .viewer{display:flex;border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;}
+  .slide-sidebar{width:168px;flex-shrink:0;background:var(--surface-2);border-right:1px solid var(--border-soft);padding:16px 0;}
+  .slide-sidebar-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 16px 12px;}
+  .slide-item{position:relative;display:flex;align-items:center;gap:10px;padding:9px 16px 9px 14px;font-size:13px;color:var(--muted);font-weight:500;}
+  .slide-item .dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--surface);border:2px solid var(--step-todo);color:var(--step-todo);}
+  .slide-item.done .dot{background:var(--step-done);border-color:var(--step-done);color:#fff;}
+  .slide-item.active{color:var(--ink);font-weight:700;background:var(--primary-soft);}
+  .slide-item.active .dot{background:var(--step-active);border-color:var(--step-active);color:#fff;box-shadow:0 0 0 4px rgba(52,82,216,.15);}
+  .slide-item .rail{position:absolute;left:23px;top:32px;width:2px;height:14px;background:var(--border);}
+  .slide-item:last-child .rail{display:none;}
+
+  .slide-main{flex:1;padding:26px 26px 24px;background:#fff;}
+  .slide-eyebrow{font-size:11.5px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:.02em;}
+  .slide-title{font-family:var(--font-display);font-size:18px;font-weight:700;margin:0 0 14px;letter-spacing:-.01em;}
+  .slide-body{font-size:14.5px;line-height:1.9;color:#333a48;user-select:text;}
+  .slide-body p{margin:0 0 13px;}
+  .slide-body strong{color:var(--ink);font-weight:700;}
+  ::selection{background:#fde3b8;}
+
+  .select-hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:16px;}
+  .help-btn{margin-top:14px;width:100%;padding:13px;border-radius:11px;border:1.5px dashed var(--accent);background:var(--accent-bg);color:var(--accent-ink);font-weight:700;font-size:14px;cursor:pointer;font-family:var(--font-body);}
+  .help-btn:hover{background:#fce4c9;}
+  .or-sep{text-align:center;color:var(--muted);font-size:12px;margin:16px 0;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
 
   /* floating "Tôi vẫn chưa hiểu" button */
-  #floatBtn{position:fixed;transform:translate(-50%,-110%);display:none;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.2);z-index:50;white-space:nowrap;}
+  #floatBtn{position:fixed;transform:translate(-50%,-112%);display:none;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(20,24,36,.28);z-index:50;white-space:nowrap;font-family:var(--font-body);}
   #floatBtn:after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--ink);}
 
   /* thread: mọi hành động tiếp theo hiện bên phải, cùng một màn hình */
   #thread{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
-  .turn{border-radius:12px;padding:14px;font-size:13px;line-height:1.6;}
-  .turn-user{background:#eff6ff;border:1px solid #bfdbfe;margin-left:12px;}
-  .turn-ai{background:var(--ai-bg);border:1px solid #ddd6fe;}
-  .turn-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
-  .turn-user .turn-label{color:#1d4ed8;}
+  .turn{border-radius:13px;padding:14px 15px;font-size:13.5px;line-height:1.65;}
+  .turn-user{background:var(--primary-soft);border:1px solid #c9d3fb;margin-left:14px;}
+  .turn-ai{background:var(--ai-bg);border:1px solid var(--ai-border);}
+  .turn-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+  .turn-user .turn-label{color:var(--primary);}
   .turn-ai .turn-label{color:var(--ai);}
-  .turn-log{color:#374151;}
+  .turn-log{color:#333a48;}
 
-  .quote-box{border-left:3px solid var(--accent);background:#fff;padding:10px 14px;border-radius:0 8px 8px 0;font-style:italic;color:#7c2d12;margin:10px 0;}
+  .quote-box{border-left:3px solid var(--accent);background:#fff;padding:10px 14px;border-radius:0 9px 9px 0;font-style:italic;color:var(--accent-ink);margin:10px 0;}
   .chips{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
-  .chip{text-align:left;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:14px;cursor:pointer;}
-  .chip.selected{border-color:var(--primary);background:#eff6ff;}
-  textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;resize:vertical;min-height:56px;margin-top:8px;}
-  .field-label{font-size:12px;color:var(--muted);margin-bottom:4px;display:block;}
+  .chip{text-align:left;padding:11px 14px;border-radius:11px;border:1px solid var(--border);background:#fff;font-size:14px;font-family:inherit;cursor:pointer;color:var(--ink-soft);}
+  .chip:hover{border-color:var(--primary);}
+  .chip.selected{border-color:var(--primary);background:var(--primary-soft);color:var(--ink);font-weight:600;}
+  textarea{width:100%;border:1px solid var(--border);border-radius:11px;padding:10px 12px;font-size:14px;font-family:inherit;resize:vertical;min-height:56px;margin-top:8px;background:#fff;}
+  textarea:focus{border-color:var(--primary);}
+  .field-label{font-size:12px;color:var(--muted);margin-bottom:4px;display:block;font-weight:500;}
   .actions{display:flex;gap:10px;margin-top:14px;}
-  .btn{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+  .btn{flex:1;padding:11px;border-radius:11px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
   .btn-primary{background:var(--primary);color:var(--primary-ink);}
-  .btn-primary:disabled{background:#c7d2fe;cursor:not-allowed;}
+  .btn-primary:hover:not(:disabled){background:#2a41b8;}
+  .btn-primary:disabled{background:#c7d0f6;cursor:not-allowed;}
   .btn-ghost{background:none;border:1px solid var(--border);color:var(--ink);}
+  .btn-outline{background:#fff;border:1px solid var(--border);color:var(--ink-soft);text-align:left;padding:12px 14px;flex:none;width:100%;font-weight:600;font-family:var(--font-body);border-radius:11px;cursor:pointer;}
+  .btn-outline:hover{border-color:var(--primary);}
+  .btn-outline .sub{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px;}
+  .actions-col{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .check-label{font-size:12px;color:var(--muted);margin:12px 0 0;font-weight:500;}
 
   .hidden{display:none;}
 </style>
@@ -83,7 +117,10 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
 <body>
 
 <div class="topbar">
-  <h1>AI Tutor — Slide 3/5: "Hàm số bậc nhất"</h1>
+  <div class="topbar-left">
+    <div class="topbar-mark">AI</div>
+    <h1>AI Tutor — Slide 4/5: "Product Discovery — Evidence"</h1>
+  </div>
   <button class="reset" onclick="resetAll()">↺ Reset (xoá hội thoại)</button>
 </div>
 
@@ -93,27 +130,27 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
 
   <!-- SLIDE — luôn hiển thị, không đổi màn hình -->
   <section class="card">
-    <span class="badge">Đang xem slide · Module 2</span>
-    <h2>Đường thẳng và hệ số góc</h2>
+    <span class="badge">Đang xem slide · Product Discovery</span>
+    <h2>Evidence mạnh và tín hiệu yếu nghe rất khác nhau</h2>
     <p class="lead">Đọc slide bên dưới. Nếu có đoạn nào bạn thấy không hiểu, hãy <strong>bôi đen đúng đoạn đó</strong> bằng chuột.</p>
 
     <div class="viewer">
       <div class="slide-sidebar">
         <div class="slide-sidebar-title">Nội dung bài học</div>
-        <div class="slide-item">1. Hàm số bậc nhất</div>
-        <div class="slide-item">2. Đồ thị đường thẳng</div>
-        <div class="slide-item active">3. Đường thẳng và hệ số góc</div>
-        <div class="slide-item">4. Luyện tập</div>
-        <div class="slide-item">5. Tổng kết</div>
+        <div class="slide-item done"><span class="dot">✓</span>1. Reverse Engineer<span class="rail"></span></div>
+        <div class="slide-item done"><span class="dot">✓</span>2. Problem Interview<span class="rail"></span></div>
+        <div class="slide-item done"><span class="dot">✓</span>3. Bản 1 vs Bản 2<span class="rail"></span></div>
+        <div class="slide-item active"><span class="dot">4</span>4. Evidence vs tín hiệu<span class="rail"></span></div>
+        <div class="slide-item"><span class="dot">5</span>5. Bài lab<span class="rail"></span></div>
       </div>
       <div class="slide-main">
-        <div class="slide-eyebrow">Slide 3 / 5</div>
-        <div class="slide-title">Đường thẳng và hệ số góc</div>
+        <div class="slide-eyebrow">Slide 4 / 5</div>
+        <div class="slide-title">Evidence mạnh và tín hiệu yếu nghe rất khác nhau</div>
         <div class="slide-body" id="slideBody">
-          <p>Cho hàm số bậc nhất có dạng tổng quát <strong>y = ax + b</strong>, trong đó a và b là hai hằng số cho trước, a ≠ 0.</p>
-          <p>Ví dụ với hàm số y = 3x − 2, ta có a = 3 và b = −2. Đại lượng a được gọi là <strong>hệ số góc</strong> của đường thẳng — nó cho biết đường thẳng dốc lên hay dốc xuống, và dốc nhiều hay ít khi nhìn trên mặt phẳng tọa độ.</p>
-          <p>Khi so sánh hai đường thẳng, đường nào có hệ số góc lớn hơn thì dốc hơn. Nếu hai đường thẳng có cùng hệ số góc nhưng khác b, chúng sẽ song song với nhau.</p>
-          <p>Ở slide tiếp theo, chúng ta sẽ dùng hệ số góc để xác định khi nào hai đường thẳng song song, cắt nhau hoặc trùng nhau.</p>
+          <p>Phiên bản 2 tốt hơn Phiên bản 1 vì <strong>thu được evidence</strong>, không phải vì nghe hay hơn. Phiên bản 1 không hỏng vì bác sĩ nói dối — cấu trúc câu hỏi chỉ cho phép họ đưa ra opinion và prediction, còn Phiên bản 2 đi theo chuỗi <strong>Event → Behavior → Workaround → Consequence</strong>.</p>
+          <p>Câu trả lời dễ nghe không phải là evidence. Có hai lý do: (1) người được hỏi <strong>trả lời cho lịch sự</strong> — họ không muốn làm bạn thất vọng, nên khen là cách rẻ nhất để kết thúc cuộc nói chuyện; (2) <strong>ai cũng muốn cái tốt hơn</strong> — hỏi về một phương án tốt hơn thì câu trả lời luôn là "có", cho tới lúc họ phải thấy nó thật và trả giá thật.</p>
+          <p>Vì vậy đừng hỏi về tương lai. Hãy hỏi về một lần đã xảy ra — ở đó không còn chỗ cho phép lịch sự.</p>
+          <p>Ở slide tiếp theo, chúng ta sẽ áp dụng nguyên tắc này vào bài lab: đặt Problem Hypothesis rồi luyện một problem interview không làm lộ solution.</p>
         </div>
       </div>
     </div>
@@ -140,9 +177,9 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
   let turnCounter = 0;
 
   const conceptExplanations = {
-    "he-so-goc": 'Hệ số góc (ký hiệu a) cho biết đường thẳng dốc lên hay dốc xuống, và dốc bao nhiêu. Trong y = 3x − 2, số đứng trước x (là 3) chính là hệ số góc.',
-    "dang-tong-quat": 'Dạng tổng quát y = ax + b có hai phần: a nhân với x, và b cộng thêm vào sau. Với y = 3x − 2: a = 3, b = −2 — hai vai trò này độc lập với nhau.',
-    "song-song": 'Hai đường thẳng song song khi chúng có cùng hệ số góc a nhưng khác b — vì độ dốc giống nhau nên chúng không bao giờ cắt nhau.'
+    "event-behavior": 'Chuỗi Event → Behavior → Workaround → Consequence là cách Phiên bản 2 thu evidence: một sự kiện cụ thể đã xảy ra (event), hành vi/tần suất thật (behavior), cách người dùng đang tự xoay xở (workaround), và hậu quả họ đang chịu (consequence). Đủ 4 mắt xích thì mới là evidence mạnh.',
+    "tra-loi-lich-su": 'Câu trả lời dễ nghe như "Nghe hay đấy, tôi thích ý tưởng này" thường chỉ là phép lịch sự — người được hỏi không muốn làm bạn thất vọng nên khen là cách rẻ nhất để kết thúc cuộc nói chuyện. Đây là tín hiệu yếu, không phải evidence.',
+    "hoi-qua-khu": 'Nguyên tắc Mom Test: hỏi một lần cụ thể đã xảy ra trong quá khứ ("kể lần gần nhất...") thay vì hỏi giả định tương lai ("bạn có muốn..."). Ở thì quá khứ, người được hỏi không còn chỗ để trả lời cho lịch sự.'
   };
 
   const sideEmpty = document.getElementById("sideEmpty");
@@ -195,7 +232,7 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
       <div class="turn-label">Bạn đã bôi đen</div>
       <div class="quote-box">"${quote}"</div>
       <span class="field-label">Muốn nói rõ thêm không? (không bắt buộc)</span>
-      <textarea id="note-${id}" placeholder="Ví dụ: mình không hiểu tại sao gọi là hệ số góc..."></textarea>
+      <textarea id="note-${id}" placeholder="Ví dụ: mình không hiểu vì sao câu trả lời lịch sự lại không phải evidence..."></textarea>
       <div class="actions">
         <button class="btn btn-primary" onclick="confirmSelect('${id}', \`${quote.replace(/`/g,"'")}\`)">Ôn lại đoạn này</button>
       </div>
@@ -206,8 +243,8 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
     const noteEl = document.getElementById("note-" + id);
     const note = noteEl.value.trim();
     finalizeLastUserTurn(`Bạn đã bôi đen: "${quote}"` + (note ? ` — Ghi chú: "${note}"` : ""));
-    const text = 'Đoạn/khái niệm bạn nêu ra liên quan tới "' + quote + '". Đây là kiến thức nền được dùng lại ở các slide sau — a trong y = ax + b chính là hệ số góc, quyết định độ dốc của đường thẳng.';
-    addTurn("turn-ai", `<div class="turn-label">AI Tutor</div><div class="turn-log">${text}</div>`);
+    const text = 'Đoạn/khái niệm bạn nêu ra liên quan tới "' + quote + '". Đây là kiến thức nền được dùng lại ở các slide sau — nhớ chuỗi Event → Behavior → Workaround → Consequence: chỉ khi đủ 4 mắt xích này, câu trả lời mới trở thành evidence mạnh chứ không còn là tín hiệu yếu.';
+    addAiTurnWithCheck(text);
   }
 
   function openBrowseTurn(){
@@ -221,9 +258,9 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
       <div class="turn-label">Bạn bấm "Tôi vẫn chưa hiểu"</div>
       <span class="field-label">Khái niệm quan trọng trong slide này — chọn đúng phần bạn chưa hiểu:</span>
       <div class="chips" id="chips-${id}">
-        <button class="chip" data-v="he-so-goc">Hệ số góc (a) là gì</button>
-        <button class="chip" data-v="dang-tong-quat">Dạng tổng quát y = ax + b</button>
-        <button class="chip" data-v="song-song">Vì sao hai đường thẳng song song</button>
+        <button class="chip" data-v="event-behavior">Chuỗi Event → Behavior → Workaround → Consequence</button>
+        <button class="chip" data-v="tra-loi-lich-su">Vì sao "nghe hay đấy" không phải evidence</button>
+        <button class="chip" data-v="hoi-qua-khu">Vì sao phải hỏi về quá khứ, không hỏi tương lai</button>
       </div>
       <span class="field-label">Hoặc mô tả tiếp (không bắt buộc):</span>
       <textarea id="note-${id}" placeholder="Mô tả phần bạn đang không hiểu..."></textarea>
@@ -260,9 +297,42 @@ Do not explain: không nói trước "bôi đen để hỏi" hay liệt kê trư
     if(selectedChip && conceptExplanations[selectedChip.dataset.v]){
       text = conceptExplanations[selectedChip.dataset.v];
     } else {
-      text = 'Dựa trên mô tả "' + note + '", đây là phần liên quan nhất mình tìm được trong bài: a trong y = ax + b chính là hệ số góc, quyết định độ dốc của đường thẳng.';
+      text = 'Dựa trên mô tả "' + note + '", đây là phần liên quan nhất mình tìm được trong bài: evidence mạnh phải đi đủ chuỗi Event → Behavior → Workaround → Consequence, còn câu trả lời chỉ có opinion hay prediction là tín hiệu yếu.';
     }
-    addTurn("turn-ai", `<div class="turn-label">AI Tutor</div><div class="turn-log">${text}</div>`);
+    addAiTurnWithCheck(text);
+  }
+
+  function addAiTurnWithCheck(text){
+    addTurn("turn-ai", `
+      <div class="turn-label">AI Tutor</div>
+      <div class="turn-log">${text}</div>
+      <div class="check-label">Bạn đã hiểu phần này chưa?</div>
+      <div class="actions-col">
+        <button class="btn btn-outline" onclick="understoodYes(this)">Mình đã hiểu<span class="sub">Có thể tiếp tục học slide này</span></button>
+        <button class="btn btn-outline" onclick="understoodNo(this)">Mình vẫn chưa hiểu<span class="sub">Hỏi tiếp AI về phần này</span></button>
+      </div>
+    `);
+  }
+
+  function understoodYes(btn){
+    const turnDiv = btn.closest(".turn");
+    const logHtml = turnDiv.querySelector(".turn-log").innerHTML;
+    turnDiv.innerHTML = `<div class="turn-label">AI Tutor</div><div class="turn-log">${logHtml}</div>`;
+    logTurn("turn-user", "Bạn", "Mình đã hiểu");
+    addTurn("turn-ai", `<div class="turn-label">AI Tutor</div><div class="turn-log">Tuyệt vời, vậy bạn có thể quay lại đọc tiếp slide. Nếu sau này gặp chỗ khác chưa hiểu, cứ bôi đen hoặc bấm "Tôi vẫn chưa hiểu" nhé.</div>`);
+  }
+
+  function understoodNo(btn){
+    const turnDiv = btn.closest(".turn");
+    const logHtml = turnDiv.querySelector(".turn-log").innerHTML;
+    turnDiv.innerHTML = `<div class="turn-label">AI Tutor</div><div class="turn-log">${logHtml}</div>`;
+    logTurn("turn-user", "Bạn", "Mình vẫn chưa hiểu");
+    logTurn("turn-ai", "AI Tutor", "Được, mình hỏi kỹ hơn nhé — chọn tiếp một khái niệm bên dưới, hoặc mô tả rõ hơn chỗ bạn đang vướng.");
+    openBrowseTurn();
+  }
+
+  function logTurn(cls, label, text){
+    return addTurn(cls, `<div class="turn-label">${label}</div><div class="turn-log">${text}</div>`);
   }
 
   function finalizeLastUserTurn(summaryHtml){
